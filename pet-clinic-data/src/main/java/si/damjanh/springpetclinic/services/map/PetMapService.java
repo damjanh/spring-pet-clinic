@@ -1,11 +1,11 @@
 package si.damjanh.springpetclinic.services.map;
 
 import si.damjanh.springpetclinic.model.Pet;
-import si.damjanh.springpetclinic.services.CrudService;
+import si.damjanh.springpetclinic.services.PetService;
 
 import java.util.Set;
 
-public class PetMapService extends AbstractMapService<Pet, Long> implements CrudService<Pet, Long> {
+public class PetMapService extends AbstractMapService<Pet, Long> implements PetService {
     @Override
     public Set<Pet> findAll() {
         return super.findAll();
