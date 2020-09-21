@@ -5,9 +5,11 @@ import org.springframework.stereotype.Component;
 import si.damjanh.springpetclinic.model.Owner;
 import si.damjanh.springpetclinic.model.Pet;
 import si.damjanh.springpetclinic.model.PetType;
+import si.damjanh.springpetclinic.model.Speciality;
 import si.damjanh.springpetclinic.model.Vet;
 import si.damjanh.springpetclinic.services.OwnerService;
 import si.damjanh.springpetclinic.services.PetTypeService;
+import si.damjanh.springpetclinic.services.SpecialityService;
 import si.damjanh.springpetclinic.services.VetService;
 
 import java.time.LocalDate;
@@ -18,17 +20,26 @@ public class DataLoader implements CommandLineRunner {
     private final OwnerService ownerService;
     private final VetService vetService;
     private final PetTypeService petTypeService;
+    private final SpecialityService specialityService;
 
     public DataLoader(OwnerService ownerService, VetService vetService,
-            PetTypeService petTypeService) {
+            PetTypeService petTypeService, SpecialityService specialityService) {
         this.ownerService = ownerService;
         this.vetService = vetService;
         this.petTypeService = petTypeService;
+        this.specialityService = specialityService;
     }
 
     @Override
     public void run(String... args) throws Exception {
+        int count = petTypeService.findAll().size();
+        if (count == 0) {
+            loadData();
+        }
+        System.out.println("Loaded data!");
+    }
 
+    private void loadData() {
         PetType dog = new PetType();
         dog.setName("Dog");
         PetType savedDogType = petTypeService.save(dog);
@@ -74,17 +85,29 @@ public class DataLoader implements CommandLineRunner {
         ownerService.save(owner2);
         ownerService.save(owner3);
 
+        Speciality radiology = new Speciality();
+        radiology.setDescription("Radiology");
+        Speciality surgery = new Speciality();
+        surgery.setDescription("Surgery");
+        Speciality dentistry = new Speciality();
+        dentistry.setDescription("Dentistry");
+
+        Speciality savedRadilogy = specialityService.save(radiology);
+        Speciality savedSurgery = specialityService.save(surgery);
+        Speciality savedDentistry = specialityService.save(dentistry);
+
         Vet vet1 = new Vet();
         vet1.setFirstName("Sam");
         vet1.setLastName("Axe");
+        vet1.getSpecialities().add(savedRadilogy);
 
         Vet vet2 = new Vet();
         vet2.setFirstName("Elliot");
         vet2.setLastName("Alderson");
+        vet2.getSpecialities().add(savedSurgery);
+        vet2.getSpecialities().add(savedDentistry);
 
         vetService.save(vet1);
         vetService.save(vet2);
-
-        System.out.println("Loaded data!");
     }
 }
