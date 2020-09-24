@@ -1,9 +1,19 @@
-version: 2.1
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk-node
+    steps:
+      - checkout
 
-orbs:
-  maven: circleci/maven@0.0.12
-
-workflows:
-  maven_test:
-    jobs:
-      - maven/test # checkout, build, test, and upload test results
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            - v1-dependencies-
+      - run: mvn -DskipTests
+      - run: mvn dependency:go-offline
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
+      - run: mvn integration-test
