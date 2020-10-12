@@ -20,8 +20,11 @@ import java.util.Set;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -85,5 +88,41 @@ class OwnersControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("owners/ownerDetails"))
                 .andExpect(MockMvcResultMatchers.model().attribute("owner", hasProperty("id", is(1L))));
+    }
+
+    @Test
+    void processCreationForm() throws Exception {
+        when(service.save(any(Owner.class))).thenReturn(Owner.builder().id(1L).build());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/owners/new"))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.view().name("redirect:/owners/1"))
+                .andExpect(MockMvcResultMatchers.model().attributeExists("owner"));
+
+        verify(service, times(1)).save(any());
+    }
+
+    @Test
+    void showUpdateOwnerForm() throws Exception {
+        when(service.findById(anyLong())).thenReturn(Owner.builder().id(1L).build());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/owners/1/edit"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("owners/createOrUpdateOwnersForm"))
+                .andExpect(MockMvcResultMatchers.model().attributeExists("owner"));
+
+        verifyZeroInteractions(service);
+    }
+
+    @Test
+    void processUpdateOwnerForm() throws Exception {
+        when(service.save(any(Owner.class))).thenReturn(Owner.builder().id(1L).build());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/owners/1/edit"))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.view().name("redirect:/owners/1"))
+                .andExpect(MockMvcResultMatchers.model().attributeExists("owner"));
+
+        verify(service, times(1)).save(any());
     }
 }
