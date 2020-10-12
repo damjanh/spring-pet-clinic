@@ -8,6 +8,7 @@ import si.damjanh.springpetclinic.services.OwnerService;
 import si.damjanh.springpetclinic.services.PetService;
 import si.damjanh.springpetclinic.services.PetTypeService;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -76,5 +77,11 @@ public class OwnerMapService extends AbstractMapService<Owner, Long> implements 
                 .filter(owner -> owner.getLastName().equalsIgnoreCase(lastName))
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public List<Owner> findAllByLastNameLike(String lastName) {
+        // TODO: implement this when needed.
+        return null;
     }
 }
